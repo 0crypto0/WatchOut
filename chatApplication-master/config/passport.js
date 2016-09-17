@@ -2,6 +2,9 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../app/models/user');
 var Online = require('../app/models/online');
 var Counter = require('../app/models/counter');
+var Client = require('../app/models/client');
+var Suspect = require('../app/models/suspects');
+var SuspeciousWord = require('../app/models/suspeciouswords');
 
 module.exports = function(passport) {
 	passport.serializeUser(function(user, done) {

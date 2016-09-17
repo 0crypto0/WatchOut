@@ -17,6 +17,16 @@ module.exports = function(passport) {
 		});
 	});
 
+	passport.serializeClient(function(client, done) {
+		done(null, client._id);
+	});
+
+	passport.deserializeUser(function(id, done) {
+		Client.findById(id, function(err, client) {
+			done(err, client);
+		});
+	});
+
 	passport.use('singup', new LocalStrategy({
 			usernameField: 'username',
 			passwordField: 'password',
@@ -37,6 +47,27 @@ module.exports = function(passport) {
 		}
 	));
 
+	passport.use('WatchOut-signup', new LocalStrategy({
+			usernameField: 'username',
+		    emailField: 'email',
+			passwordField: 'password',
+			passReqToCallback: true
+		},
+		function(req, username, password, email, done) {
+			process.nextTick(function() {
+				Client.findOne({ 'username': username }, function(err, client) {
+					if (err) return done(err);
+					if (client) {
+						return done(null, false, req.flash('singupMessage', 'That username is already taken.'));
+						console.log("That username is already taken");
+					} else {
+						createClient(username, password, email, done);
+					}
+				});
+			});
+		}
+	));
+//////////////////////////////////////////////////////////////////////////////////////TODO
 	passport.use('login', new LocalStrategy({
 			usernameField: 'username',
 			passwordField: 'password',
@@ -66,6 +97,25 @@ module.exports = function(passport) {
 				newUser.name = name;
 				newUser.password = newUser.generateHash(password);
 				
+				// save user
+				newUser.save(function(err) {
+					if (err) throw err;
+					return callback(null, newUser);
+				});
+			});
+		});
+	}
+
+	createClient = function(username, password, email, callback) {
+		initCounter(function() {
+			getNextSequence("userid", function(counter) {
+				var newClient = new Client();
+				newClient._id = counter.seq;
+				newClient.username = username;
+				newClient.password = newUser.generateHash(password);
+				newClient.email = email;
+
+
 				// save user
 				newUser.save(function(err) {
 					if (err) throw err;

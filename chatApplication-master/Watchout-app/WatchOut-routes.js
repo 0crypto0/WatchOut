@@ -12,7 +12,7 @@ module.exports = function(app, passport, io) {
 	
 	// home page
 	app.get('/', isLoggedIn, function(req, res) {
-		res.render('WatchOut-index.ejs', {user: req.user});
+		res.render('WatchOut-index.ejs', {client: req.client});
 	});
 
 	// login page
@@ -22,20 +22,20 @@ module.exports = function(app, passport, io) {
 
 	// process login
 	app.post('/WatchOut-login', function(req, res, next) {
-		passport.authenticate('login', function(err, user, info) {
+		passport.authenticate('WatchOut-login', function(err, user, info) {
 			if (err) return next(err);
-			if (!user) return res.redirect('/login');
+			if (!user) return res.redirect('/WatchOut-login');
 			req.logIn(user, function(err) {
 				if (err) return next(err);
-				var redirect_to = req.session.redirect_to || '/profile';
+				var redirect_to = req.session.redirect_to || '/WatchOut-profile';
 				return res.redirect(redirect_to);
 			});
 		})(req, res, next);
 	});
 
 	// sign up page
-	app.get('/signup', function(req, res) {
-		res.render('signup.ejs', { message: req.flash('signupMessage') });
+	app.get('/WatchOut-signup', function(req, res) {
+		res.render('WatchOut-signup.ejs', { message: req.flash('signupMessage') });
 	});
 
 	// process signup

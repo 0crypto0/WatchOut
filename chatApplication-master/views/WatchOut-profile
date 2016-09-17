@@ -49,7 +49,15 @@
                     <strong>WatchedOutChat</strong>: <%= client.WatchedOutChat %><br>
                     <strong>password</strong>: <%= user.password %>
                 </p>
+                <h3><span class="fa fa-user"></span> Watched Chats</h3>
 
+                <p>
+                    <strong>id</strong>: <%= client._id %><br>
+                    <strong>username</strong>: <%= client.username %><br>
+                    <strong>email</strong>: <%= client.email %><br>
+                    <strong>WatchedOutChat</strong>: <%= client.WatchedOutChat %><br>
+                    <strong>password</strong>: <%= user.password %>
+                </p>
             </div>
         </div>
 

@@ -1,9 +1,6 @@
-var Message = require('./models/message');
-var User = require('./models/user');
-var Online = require('./models/online');
-var Counter = require('./models/counter');
 var mongoose = require('mongoose');
 var _ = require('underscore');
+var Online = require(' ./../app/models/online');
 var async = require('async');
 var dateFormat = require('dateformat');
 
@@ -15,16 +12,16 @@ module.exports = function(app, passport, io) {
 	
 	// home page
 	app.get('/', isLoggedIn, function(req, res) {
-		res.render('index.ejs', {user: req.user});
+		res.render('WatchOut-index.ejs', {user: req.user});
 	});
 
 	// login page
-	app.get('/login', function(req, res) {
-		res.render('login.ejs', { message: req.flash('loginMessage') });
+	app.get('/WatchOut-login', function(req, res) {
+		res.render('WatchOut-login.ejs', { message: req.flash('loginMessage') });
 	});
 
 	// process login
-	app.post('/login', function(req, res, next) {
+	app.post('/WatchOut-login', function(req, res, next) {
 		passport.authenticate('login', function(err, user, info) {
 			if (err) return next(err);
 			if (!user) return res.redirect('/login');

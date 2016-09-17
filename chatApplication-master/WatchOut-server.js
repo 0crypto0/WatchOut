@@ -32,7 +32,7 @@ app.use(passport.session());	// persistent login session
 app.use(flash());
 
 // routes
-require('./app/routes.js')(app, passport, io);
+require('./Watchout-app/WatchOut-routes.js')(app, passport, io);
 require('./config/passport')(passport); // config passport
 
 // lauch server

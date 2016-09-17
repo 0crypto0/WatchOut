@@ -2,6 +2,7 @@
   <component name="FileTypeManager" version="17">
     <extensionMap>
       <mapping pattern="WatchOut-signup" type="EJS" />
+      <mapping pattern="WatchOut-login" type="EJS" />
       <mapping pattern="Wacthout-login" type="EJS" />
       <mapping pattern="WacthOut-login" type="EJS" />
       <mapping pattern="WatchOut-profile" type="EJS" />

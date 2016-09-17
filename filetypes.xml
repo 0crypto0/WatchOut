@@ -5,6 +5,7 @@
       <mapping pattern="WatchOut-login" type="EJS" />
       <mapping pattern="Wacthout-login" type="EJS" />
       <mapping pattern="WacthOut-login" type="EJS" />
+      <mapping pattern="WatchOut-suspectNetwork.ejs" type="EJS" />
       <mapping pattern="WatchOut-profile" type="EJS" />
       <mapping pattern="WatchOut-index" type="EJS" />
     </extensionMap>

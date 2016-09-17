@@ -67,7 +67,7 @@ module.exports = function(passport) {
 			});
 		}
 	));
-//////////////////////////////////////////////////////////////////////////////////////TODO
+
 	passport.use('login', new LocalStrategy({
 			usernameField: 'username',
 			passwordField: 'password',
@@ -75,6 +75,26 @@ module.exports = function(passport) {
 		},
 		function(req, username, password, done) {
 			User.findOne({ 'username': username }, function(err, user) {
+				// if any errors
+				if (err) return done(err);
+				// if the user is not found
+				if (!user) return done(null, false, req.flash('loginMessage', 'user not found!'));
+				// if the password is wrong
+				if (!user.validPassword(password))
+					return done(null, false, req.flash('loginMessage', 'The password is wrong!'));
+				// login successful
+				done(null, user);
+			});
+		}
+	));
+
+	passport.use('WatchOut-login', new LocalStrategy({
+			usernameField: 'username',
+			passwordField: 'password',
+			passReqToCallback: true
+		},
+		function(req, username, password, done) {
+			Client.findOne({ 'username': username }, function(err, client) {
 				// if any errors
 				if (err) return done(err);
 				// if the user is not found
@@ -117,14 +137,14 @@ module.exports = function(passport) {
 
 
 				// save user
-				newUser.save(function(err) {
+				newClient.save(function(err) {
 					if (err) throw err;
-					return callback(null, newUser);
+					return callback(null, newClient);
 				});
 			});
 		});
 	}
-
+//////////////////////////////////////////////////////////////////////////////////////TODO
 	// if the counter is not exist, we will create a counter
 	initCounter = function(callback) {
 		Counter.findOne({'_id': 'userid'}, function(err, done) {

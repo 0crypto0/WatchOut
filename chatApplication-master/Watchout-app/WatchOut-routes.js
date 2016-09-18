@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var _ = require('underscore');
-var Online = require(' ./../app/models/online');
+var Online = require('./../app/models/online');
 var async = require('async');
 var dateFormat = require('dateformat');
 var Client = require('./models/client');

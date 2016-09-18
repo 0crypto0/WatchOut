@@ -17,7 +17,7 @@ module.exports = function(passport) {
 		});
 	});
 
-	passport.serializeClient(function(client, done) {
+	passport.serializeUser(function(client, done) {
 		done(null, client._id);
 	});
 
@@ -68,6 +68,35 @@ module.exports = function(passport) {
 		}
 	));
 
+	passport.use('assignChatsToWatch', new LocalStrategy({
+			testAppField: 'testApp',
+			WhatappField: 'Whatapp',
+			FacebookMessengerField: 'FacebookMessenger',
+			TwitterField: 'Twitter',
+			WoWField: 'WoW',
+			passReqToCallback: true
+		},////////////////////////////////
+		function(req, testApp, Whatapp, FacebookMessenger, Twitter, WoW, done) {
+			process.nextTick(function() {
+				Client.findOne({ 'username': Online.username }, function(err, client) {
+					if (err) return done(err);
+					if (!client) {
+						return done(null, false, req.flash('assignChats', 'That chats is already assigned.'));
+						console.log("That chats is already assigned");
+					} else {
+						var FieldArr = new Array(testApp,Whatapp,FacebookMessenger,Twitter,WoW);
+						for(var i = 0; i < FieldArr.length; i++)
+						{
+							if(FieldArr[i])
+							{
+								client.WatchedOutChat.push(FieldArr[i]);
+							}
+						}
+					}
+				});
+			});
+		}
+	));
 	passport.use('login', new LocalStrategy({
 			usernameField: 'username',
 			passwordField: 'password',
@@ -98,12 +127,12 @@ module.exports = function(passport) {
 				// if any errors
 				if (err) return done(err);
 				// if the user is not found
-				if (!user) return done(null, false, req.flash('loginMessage', 'user not found!'));
+				if (!client) return done(null, false, req.flash('loginMessage', 'user not found!'));
 				// if the password is wrong
-				if (!user.validPassword(password))
+				if (!client.validPassword(password))
 					return done(null, false, req.flash('loginMessage', 'The password is wrong!'));
 				// login successful
-				done(null, user);
+				done(null, client);
 			});
 		}
 	));
@@ -127,12 +156,12 @@ module.exports = function(passport) {
 	}
 
 	createClient = function(username, password, email, callback) {
-		initCounter(function() {
-			getNextSequence("userid", function(counter) {
+		initCounterClient(function() {
+			getNextSequence("clientId", function(counter) {
 				var newClient = new Client();
 				newClient._id = counter.seq;
 				newClient.username = username;
-				newClient.password = newUser.generateHash(password);
+				newClient.password = newClient.generateHash(password);
 				newClient.email = email;
 
 
@@ -144,8 +173,28 @@ module.exports = function(passport) {
 			});
 		});
 	}
+
 //////////////////////////////////////////////////////////////////////////////////////TODO
-	// if the counter is not exist, we will create a counter
+	initCounterClient = function(callback) {
+		Counter.findOne({'_id': 'clientId'}, function(err, done) {
+			if (err) throw err;
+			if (!done) {
+				var counter = new Counter();
+				counter._id = "clientId";
+				counter.seq = 0;
+				counter.save(function(err) {
+					if (err) throw err;
+					callback();
+				});
+			} else {
+				callback();
+			}
+		});
+	},
+
+
+
+		// if the counter is not exist, we will create a counter
 	initCounter = function(callback) {
 		Counter.findOne({'_id': 'userid'}, function(err, done) {
 			if (err) throw err;

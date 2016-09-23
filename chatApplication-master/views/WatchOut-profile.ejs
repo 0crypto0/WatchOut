@@ -17,8 +17,8 @@
         var socket = io();
         $(function(){
             $("#chat").on("click", function () {
-                var user = <%- JSON.stringify(user) %>;
-                $.get("/chat", { user: user }, function(data) {
+                var client = <%- JSON.stringify(client) %>;
+                $.get("/chat", { client: client }, function(data) {
                     $("#chat").val("")
                 });
             })
@@ -47,8 +47,34 @@
                     <strong>username</strong>: <%= client.username %><br>
                     <strong>email</strong>: <%= client.email %><br>
                     <strong>WatchedOutChat</strong>: <%= client.WatchedOutChat %><br>
-                    <strong>password</strong>: <%= user.password %>
+                    <strong>password</strong>: <%= client.password %>
                 </p>
+                <h3><span class="fa fa-user"></span> Watched Chats</h3>
+
+                <form action="/assignChatsToWatch" method="post">
+                    <div class="form-group">
+                        <label>Test Chat App</label>
+                        <input type="checkbox" class="form-control" name="testApp"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Whatapp</label>
+                        <input type="checkbox" class="form-control" name="Whatapp"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Facebook Messenger</label>
+                        <input type="checkbox" class="form-control" name="Facebook Messenger"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter</label>
+                        <input type="checkbox" class="form-control" name="Twitter"/>
+                    </div>
+                    <div class="form-group">
+                        <label>World Of Warcraft</label>
+                        <input type="checkbox" class="form-control" name="WoW"/>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning btn-lg">Submit</button>
+                </form>
 
             </div>
         </div>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.1/raphael.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/graphdracula/1.0.3/dracula.min.js"></script>
+    <style>
+        body {
+            padding-left: 450px;
+        }
+
+        #h1 {
+            padding-left: 700;
+            color: solid red;
+        }
+    </style>
+</head>
+<body>
+<h1><span class="fa fa-sign-in"></span>Suspects Network</h1>
+<div id="canvas" style="height: 600px; width: 1000px; border: 1px solid black; border-radius: 8px;" ></div>
+<script>
+    var redraw;
+    window.onload = function() {
+
+        var g = new Dracula.Graph();
+        var layouter = new Dracula.Layout.Spring(g);
+        var renderer = new Dracula.Renderer.Raphael('#canvas', g, 1000, 600);
+        var i = 0;
+        var suspects = [['spent','two'],
+            ['two','fucking'],
+            ['fucking','hours'],
+            ['hours','on'],
+            ['on','that'],
+            ['that','shit'],
+            ['ori', 'guy']];
+
+        for(i = 0; i < suspects.length; i++) {
+            g.addEdge(suspects[i][0], suspects[i][1]);
+        }
+
+        layouter.layout();
+        renderer.draw()
+
+        window.redraw = function() {
+            layouter.layout();
+            renderer.draw();
+        };
+
+    };
+</script>
+<button id="redraw" onclick="redraw();">redraw</button>
+</body>
+</html>

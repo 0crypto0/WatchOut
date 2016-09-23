@@ -2,9 +2,9 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../app/models/user');
 var Online = require('../app/models/online');
 var Counter = require('../app/models/counter');
-var Client = require('../app/models/client');
-var Suspect = require('../app/models/suspects');
-var SuspeciousWord = require('../app/models/suspeciouswords');
+var Client = require('../Watchout-app/models/client');
+var Suspect = require('../Watchout-app/models/suspects');
+var SuspeciousWord = require('../Watchout-app/models/suspeciouswords');
 
 module.exports = function(passport) {
 	passport.serializeUser(function(user, done) {
@@ -14,6 +14,16 @@ module.exports = function(passport) {
 	passport.deserializeUser(function(id, done) {
 		User.findById(id, function(err, user) {
 			done(err, user);
+		});
+	});
+
+	passport.serializeUser(function(client, done) {
+		done(null, client._id);
+	});
+
+	passport.deserializeUser(function(id, done) {
+		Client.findById(id, function(err, client) {
+			done(err, client);
 		});
 	});
 
@@ -37,6 +47,56 @@ module.exports = function(passport) {
 		}
 	));
 
+	passport.use('WatchOut-signup', new LocalStrategy({
+			usernameField: 'username',
+		    emailField: 'email',
+			passwordField: 'password',
+			passReqToCallback: true
+		},
+		function(req, username, password, email, done) {
+			process.nextTick(function() {
+				Client.findOne({ 'username': username }, function(err, client) {
+					if (err) return done(err);
+					if (client) {
+						return done(null, false, req.flash('singupMessage', 'That username is already taken.'));
+						console.log("That username is already taken");
+					} else {
+						createClient(username, password, email, done);
+					}
+				});
+			});
+		}
+	));
+
+	passport.use('assignChatsToWatch', new LocalStrategy({
+			testAppField: 'testApp',
+			WhatappField: 'Whatapp',
+			FacebookMessengerField: 'FacebookMessenger',
+			TwitterField: 'Twitter',
+			WoWField: 'WoW',
+			passReqToCallback: true
+		},////////////////////////////////
+		function(req, testApp, Whatapp, FacebookMessenger, Twitter, WoW, done) {
+			process.nextTick(function() {
+				Client.findOne({ 'username': Online.username }, function(err, client) {
+					if (err) return done(err);
+					if (!client) {
+						return done(null, false, req.flash('assignChats', 'That chats is already assigned.'));
+						console.log("That chats is already assigned");
+					} else {
+						var FieldArr = new Array(testApp,Whatapp,FacebookMessenger,Twitter,WoW);
+						for(var i = 0; i < FieldArr.length; i++)
+						{
+							if(FieldArr[i])
+							{
+								client.WatchedOutChat.push(FieldArr[i]);
+							}
+						}
+					}
+				});
+			});
+		}
+	));
 	passport.use('login', new LocalStrategy({
 			usernameField: 'username',
 			passwordField: 'password',
@@ -53,6 +113,26 @@ module.exports = function(passport) {
 					return done(null, false, req.flash('loginMessage', 'The password is wrong!'));
 				// login successful
 				done(null, user);
+			});
+		}
+	));
+
+	passport.use('WatchOut-login', new LocalStrategy({
+			usernameField: 'username',
+			passwordField: 'password',
+			passReqToCallback: true
+		},
+		function(req, username, password, done) {
+			Client.findOne({ 'username': username }, function(err, client) {
+				// if any errors
+				if (err) return done(err);
+				// if the user is not found
+				if (!client) return done(null, false, req.flash('loginMessage', 'user not found!'));
+				// if the password is wrong
+				if (!client.validPassword(password))
+					return done(null, false, req.flash('loginMessage', 'The password is wrong!'));
+				// login successful
+				done(null, client);
 			});
 		}
 	));
@@ -75,7 +155,46 @@ module.exports = function(passport) {
 		});
 	}
 
-	// if the counter is not exist, we will create a counter
+	createClient = function(username, password, email, callback) {
+		initCounterClient(function() {
+			getNextSequence("clientId", function(counter) {
+				var newClient = new Client();
+				newClient._id = counter.seq;
+				newClient.username = username;
+				newClient.password = newClient.generateHash(password);
+				newClient.email = email;
+
+
+				// save user
+				newClient.save(function(err) {
+					if (err) throw err;
+					return callback(null, newClient);
+				});
+			});
+		});
+	}
+
+//////////////////////////////////////////////////////////////////////////////////////TODO
+	initCounterClient = function(callback) {
+		Counter.findOne({'_id': 'clientId'}, function(err, done) {
+			if (err) throw err;
+			if (!done) {
+				var counter = new Counter();
+				counter._id = "clientId";
+				counter.seq = 0;
+				counter.save(function(err) {
+					if (err) throw err;
+					callback();
+				});
+			} else {
+				callback();
+			}
+		});
+	},
+
+
+
+		// if the counter is not exist, we will create a counter
 	initCounter = function(callback) {
 		Counter.findOne({'_id': 'userid'}, function(err, done) {
 			if (err) throw err;

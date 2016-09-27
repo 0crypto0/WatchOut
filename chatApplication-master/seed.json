@@ -1,0 +1,5 @@
+{
+	"undefined": "127.0.0.1:27017/chat-application",
+	"dev": "localhost/DEV_DB_NAME",
+	"prod": "localhost/PROD_DB_NAME"
+}

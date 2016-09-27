@@ -7,6 +7,8 @@ var Client = require('./models/client');
 var SuspeciousWord = require('./models/suspeciouswords');
 var Suspect = require('./models/suspects');
 var Message = require('./../app/models/message');
+var Filter = require('bad-words'),
+ filter = new Filter();
 
 var sessionTime = 10000; // 10 seconds
 
@@ -91,7 +93,7 @@ module.exports = function(app, passport, io) {
 
 		socket.on("i-am-online", function(data) {
 			if (data) {
-				clientId = data.clientId;
+				clientId = data.userId;
 				Client.findById(clientId, function(err, client) {
 					if (err) return callback(err);
 					if (client) {

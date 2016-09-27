@@ -21,7 +21,7 @@ module.exports = function(passport) {
 		done(null, client._id);
 	});
 
-	passport.deserializeUser(function(id, done) {
+	passport.deserializeClient(function(id, done) {
 		Client.findById(id, function(err, client) {
 			done(err, client);
 		});
@@ -53,7 +53,7 @@ module.exports = function(passport) {
 			passwordField: 'password',
 			passReqToCallback: true
 		},
-		function(req, username, password, email, done) {
+		function(req, username, password, done) {
 			process.nextTick(function() {
 				Client.findOne({ 'username': username }, function(err, client) {
 					if (err) return done(err);
@@ -61,7 +61,7 @@ module.exports = function(passport) {
 						return done(null, false, req.flash('singupMessage', 'That username is already taken.'));
 						console.log("That username is already taken");
 					} else {
-						createClient(username, password, email, done);
+						createClient(username, password, req.param('email'), done);
 					}
 				});
 			});
@@ -156,8 +156,8 @@ module.exports = function(passport) {
 	}
 
 	createClient = function(username, password, email, callback) {
-		initCounterClient(function() {
-			getNextSequence("clientId", function(counter) {
+		initCounter(function() {
+			getNextSequence("userid", function(counter) {
 				var newClient = new Client();
 				newClient._id = counter.seq;
 				newClient.username = username;
@@ -175,12 +175,12 @@ module.exports = function(passport) {
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////TODO
-	initCounterClient = function(callback) {
-		Counter.findOne({'_id': 'clientId'}, function(err, done) {
+/*	initCounterClient = function(callback) {
+		Counter.findOne({'_id': 'userid'}, function(err, done) {
 			if (err) throw err;
 			if (!done) {
 				var counter = new Counter();
-				counter._id = "clientId";
+				counter._id = "userid";
 				counter.seq = 0;
 				counter.save(function(err) {
 					if (err) throw err;
@@ -190,7 +190,7 @@ module.exports = function(passport) {
 				callback();
 			}
 		});
-	},
+	},*/
 
 
 

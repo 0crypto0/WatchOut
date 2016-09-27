@@ -14,7 +14,8 @@ var cookieParser = require('cookie-parser');
 var session 	= require('express-session');
 var flash 		= require('connect-flash');
 var passport 	= require('passport');
-
+var LineByLineReader = require('line-by-line'),
+    lr = new LineByLineReader('./seeds/blacklist.txt');
 var configDB 	= require('./config/database.js');
 
 // connect to database
@@ -35,6 +36,18 @@ app.use(flash());
 require('./Watchout-app/WatchOut-routes.js')(app, passport, io);
 require('./config/passport')(passport); // config passport
 
+lr.on('error', function (err) {
+    // 'err' contains error object
+});
+
+lr.on('line', function (line) {
+
+    // 'line' contains the current line without the trailing newline character.
+});
+
+lr.on('end', function () {
+    // All lines are read, file is closed now.
+});
 // lauch server
 http.listen(port, function() {
     console.log('listening on *: ' + port);
